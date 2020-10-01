@@ -7,10 +7,14 @@ import (
 	"fmt"
 	"io"
 	"os"
+
+	"github.com/XiupengMa/2p2_poker_evaluator/hand"
 )
 
 type Evaluator struct {
-	handRanks []uint32
+	handRanksLookups []uint32
+	handTypes        []string
+	cardIndices      map[hand.Card]uint8
 }
 
 func NewEvaluator(handRanksFilePath string) (*Evaluator, error) {
@@ -19,7 +23,7 @@ func NewEvaluator(handRanksFilePath string) (*Evaluator, error) {
 		return nil, err
 	}
 	return &Evaluator{
-		handRanks: ranks,
+		handRanksLookups: ranks,
 	}, nil
 }
 
@@ -60,7 +64,7 @@ func loadHandRank(filePath string) ([]uint32, error) {
 
 // Debug print out debug info
 func Debug() {
-	ranks, err := loadHandRank()
+	ranks, err := loadHandRank("./data/HandRanks.dat")
 	if err != nil {
 		fmt.Println(err)
 		return
