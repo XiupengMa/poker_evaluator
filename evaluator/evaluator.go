@@ -24,11 +24,23 @@ func NewEvaluator(handRanksFilePath string) (*Evaluator, error) {
 	}
 	return &Evaluator{
 		handRanksLookups: ranks,
+		handTypes:        getHandTypes(),
+		cardIndices:      generateCardIndices(),
 	}, nil
 }
 
-func (evaluator *Evaluator) evalHand() {
+func (evaluator *Evaluator) evalHand(hand hand.Hand) (uint32, string) {
+	index := uint32(53)
 
+	for _, card := range hand {
+		index = evaluator.handRanksLookups[index+uint32(evaluator.cardIndices[card])]
+	}
+
+	if hand.Len() < 7 {
+		index = evaluator.handRanksLookups[index]
+	}
+
+	return index, evaluator.handTypes[index>>12]
 }
 
 func loadHandRank(filePath string) ([]uint32, error) {
@@ -62,16 +74,64 @@ func loadHandRank(filePath string) ([]uint32, error) {
 	return ranks, nil
 }
 
+func getHandTypes() []string {
+	return []string{
+		"BAD",
+		"HIGH CARD",
+		"PAIR",
+		"TWO PAIRS",
+		"THREE OF A KIND",
+		"STRAIGHT",
+		"FLUSH",
+		"FULL HOUSE",
+		"FOUR OF A KIND",
+		"STRAIGHT FLUSH",
+	}
+}
+
+func generateCardIndices() map[hand.Card]uint8 {
+	ranks := hand.GetValidRanks()
+	suits := hand.GetValidSuits()
+
+	count := uint8(1)
+	indices := make(map[hand.Card]uint8)
+	for _, rank := range ranks {
+		for _, suit := range suits {
+			card := hand.Card(fmt.Sprintf("%s%s", suit, rank))
+			indices[card] = count
+			count++
+		}
+	}
+	return indices
+}
+
 // Debug print out debug info
 func Debug() {
-	ranks, err := loadHandRank("./data/HandRanks.dat")
+	e, err := NewEvaluator("./data/HandRanks.dat")
+
 	if err != nil {
 		fmt.Println(err)
-		return
 	}
-	fmt.Println(len(ranks))
-	fmt.Println(ranks[54])
-	for i := 0; i < 100; i++ {
-		fmt.Printf("%d:%d\n", i, ranks[i])
+	hand1 := []hand.Card{
+		hand.Card("S2"),
+		hand.Card("S3"),
+		hand.Card("S4"),
+		hand.Card("S5"),
+		hand.Card("S6"),
 	}
+
+	hand2 := []hand.Card{
+		hand.Card("S2"),
+		hand.Card("S3"),
+		hand.Card("S4"),
+		hand.Card("S5"),
+		hand.Card("SA"),
+	}
+	rank, name := e.evalHand(hand1)
+	fmt.Println(rank)
+	fmt.Println(name)
+
+	rank2, name2 := e.evalHand(hand2)
+	fmt.Println(rank2)
+	fmt.Println(name2)
 }

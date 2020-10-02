@@ -1,6 +1,7 @@
 package hand
 
-func getValidRanks() []string {
+// GetValidRanks returns all the valid ranks
+func GetValidRanks() []string {
 	return []string{
 		"2",
 		"3",
@@ -18,7 +19,8 @@ func getValidRanks() []string {
 	}
 }
 
-func getValidSuits() []string {
+// GetValidSuits returns all the valid suits
+func GetValidSuits() []string {
 	return []string{
 		"S",
 		"H",
@@ -43,10 +45,10 @@ func isValidCard(str string) bool {
 		return false
 	}
 	suit, rank := str[0:1], str[1:]
-	if !find(getValidSuits(), suit) {
+	if !find(GetValidSuits(), suit) {
 		return false
 	}
-	if !find(getValidRanks(), rank) {
+	if !find(GetValidRanks(), rank) {
 		return false
 	}
 	return true

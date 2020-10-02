@@ -1,7 +1,7 @@
 package main
 
 import (
-	evaluator "./evaluator"
+	"github.com/XiupengMa/2p2_poker_evaluator/evaluator"
 )
 
 func main() {
