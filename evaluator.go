@@ -5,8 +5,8 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"github.com/markbates/pkger"
 	"io"
-	"os"
 )
 
 // GetValidRanks returns all the valid ranks
@@ -47,7 +47,7 @@ type Evaluator struct {
 
 // NewEvaluator returns a new EValuator
 func NewEvaluator() (*Evaluator, error) {
-	ranks, err := loadHandRank("./data/HandRanks.dat")
+	ranks, err := loadHandRank("/data/HandRanks.dat")
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (evaluator *Evaluator) EvalHand(hand []string) (uint32, string) {
 }
 
 func loadHandRank(filePath string) ([]uint32, error) {
-	file, err := os.Open(filePath)
+	file, err := pkger.Open(filePath)
 
 	if err != nil {
 		return nil, err
